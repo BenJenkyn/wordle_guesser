@@ -51,14 +51,26 @@
 	function onKeyDown(event: KeyboardEvent) {
 		inputRefs.forEach((ref, idx) => {
 			if (ref === event.currentTarget) {
+				// debugger;
 				if (event.key === 'Backspace') {
 					event.preventDefault();
+					if (ref.value.length === 0) {
+						inputRefs[idx > 0 ? idx - 1 : 0].value = '';
+						wordGuess[idx > 0 ? idx - 1 : 0].letter = '';
+						inputRefs[idx > 0 ? idx - 1 : 0].focus();
+					}
 					ref.value = '';
-					inputRefs[idx > 0 ? idx - 1 : 0].focus();
-				} else if (event.keyCode >= 65 && event.keyCode <= 90) {
+					wordGuess[idx].letter = '';
+				} else if (
+					event.keyCode >= 65 &&
+					event.keyCode <= 90 &&
+					event.altKey === false &&
+					event.metaKey === false
+				) {
 					event.preventDefault();
 					wordGuess[idx].letter = event.key.toUpperCase();
 					ref.value = event.key.toUpperCase();
+					wordGuess[idx].letter = event.key.toUpperCase();
 					inputRefs[idx < inputRefs.length ? idx + 1 : idx].focus();
 				}
 			}
@@ -71,7 +83,6 @@
 		wordGuess.forEach((letter, idx) => {
 			switch (letter.guessType) {
 				case GuessType.grey: {
-					debugger;
 					tempWordList = tempWordList.filter((word) => {
 						if (word.includes(letter.letter)) {
 							console.log(letter.letter);

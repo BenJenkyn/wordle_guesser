@@ -92,7 +92,7 @@
 		let tempWordList = wordList;
 		// debugger;
 		// guessedWords = [...guessedWords, structuredClone(wordGuess)];
-		console.log(guessedWords);
+		// console.log(guessedWords);
 		wordGuess.forEach((letter, idx) => {
 			switch (letter.guessType) {
 				case GuessType.grey: {

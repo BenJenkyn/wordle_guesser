@@ -9,15 +9,26 @@
 <script lang="ts">
 	import { getWordList } from './lib/getWordList';
 
-	let wordList: string[];
+	const wordListFilled = 'word-list-filled';
+
+	let wordList: string[] = [];
+	// let guessedWords: {
+	// 	letter: string;
+	// 	guessType: GuessType;
+	// }[][] = [];
+	let isLoading = true;
 	getWordList()
 		.then((res) => {
 			res.forEach((word, idx) => {
 				res[idx] = word.toUpperCase();
 			});
 			wordList = res;
+			isLoading = false;
 		})
-		.catch((error) => console.error(error));
+		.catch((error) => {
+			console.error(error);
+			isLoading = false;
+		});
 	let wordGuess = [
 		{
 			letter: '',
@@ -44,14 +55,13 @@
 	let guessTypes = [GuessType.grey, GuessType.yellow, GuessType.green];
 	let inputRefs: HTMLInputElement[] = [];
 
-	function assignRefs(el) {
+	function assignRefs(el: HTMLInputElement) {
 		inputRefs.push(el);
 	}
 
-	function onKeyDown(event: KeyboardEvent) {
+	async function onKeyDown(event: KeyboardEvent) {
 		inputRefs.forEach((ref, idx) => {
 			if (ref === event.currentTarget) {
-				// debugger;
 				if (event.key === 'Backspace') {
 					event.preventDefault();
 					if (ref.value.length === 0) {
@@ -77,9 +87,12 @@
 		});
 	}
 
-	function onSubmit(e: SubmitEvent) {
-		e.preventDefault();
+	function onSubmit(event: SubmitEvent) {
+		event.preventDefault();
 		let tempWordList = wordList;
+		// debugger;
+		// guessedWords = [...guessedWords, structuredClone(wordGuess)];
+		console.log(guessedWords);
 		wordGuess.forEach((letter, idx) => {
 			switch (letter.guessType) {
 				case GuessType.grey: {
@@ -113,8 +126,10 @@
 			}
 			// Resets the form
 			letter.letter = '';
+			inputRefs[idx].value = '';
 			letter.guessType = GuessType.grey;
 		});
+		inputRefs[0].focus();
 		wordList = tempWordList;
 	}
 </script>
@@ -122,24 +137,196 @@
 <main>
 	<h1>Input Wordle Guess</h1>
 	<form on:submit={onSubmit}>
-		{#each wordGuess as letter, index}
-			<input
-				type="text"
-				bind:value={letter.letter}
-				maxlength="1"
-				bind:this={inputRefs[index]}
-				use:assignRefs
-				on:keydown={onKeyDown}
-				required
-			/>
-			{#each guessTypes as guess}
-				<input type="radio" bind:group={letter.guessType} value={guess} />
+		<div class="word-area">
+			{#each wordGuess as letter, index}
+				<div class="letter-inputs">
+					<input
+						type="text"
+						bind:value={letter.letter}
+						maxlength="1"
+						bind:this={inputRefs[index]}
+						use:assignRefs
+						on:keydown={onKeyDown}
+						required
+						class={`letter-input letter-input-${letter.guessType}`}
+					/>
+					<div class="radios">
+						{#each guessTypes as guess}
+							<label class="container">
+								<input
+									type="radio"
+									bind:group={letter.guessType}
+									value={guess}
+								/>
+								<span class={`checkmark checkmark-${guess}`} />
+							</label>
+						{/each}
+					</div>
+				</div>
 			{/each}
-			<p>{letter.guessType}</p>
-		{/each}
-		<button>Submit</button>
+		</div>
+		<button class="submit-button">Submit</button>
 	</form>
-	<div>
-		<p>{wordList}</p>
+	<div class={`word-list ${wordList.length > 0 ? wordListFilled : ''}`}>
+		{#if isLoading}
+			<p>loading...</p>
+		{:else if wordList.length === 0}
+			<p>NO WORDS AVALIBLE...</p>
+		{:else}
+			{#each wordList as word}
+				<p>{word}</p>
+			{/each}
+		{/if}
 	</div>
 </main>
+
+<style>
+	h1 {
+		text-align: center;
+	}
+
+	form {
+		text-align: center;
+	}
+
+	.letter-input {
+		height: 45.2px;
+		width: 45.2px;
+		font-size: 2rem;
+		text-align: center;
+		font-weight: bold;
+		background-color: black;
+		color: white;
+		border-width: 0px;
+		border-radius: 0px;
+		margin-bottom: 1rem;
+	}
+
+	.letter-input-grey {
+		background-color: var(--dark-grey);
+	}
+	.letter-input-yellow {
+		background-color: var(--dark-yellow);
+	}
+	.letter-input-green {
+		background-color: var(--dark-green);
+	}
+
+	.word-area {
+		display: flex;
+		gap: 5px;
+		justify-content: center;
+	}
+
+	.radios {
+		display: flex;
+		flex-direction: column;
+		border-width: 1px;
+	}
+
+	.container {
+		display: block;
+		position: relative;
+		padding-left: 35px;
+		margin-top: 0.1rem;
+		cursor: pointer;
+		font-size: 22px;
+		-webkit-user-select: none;
+		-moz-user-select: none;
+		-ms-user-select: none;
+		user-select: none;
+	}
+
+	.container input {
+		opacity: 0;
+		cursor: pointer;
+		height: 0;
+		width: 0;
+	}
+
+	.checkmark {
+		position: absolute;
+		top: 0;
+		left: 0;
+		height: 100%;
+		width: 100%;
+	}
+	.checkmark-grey {
+		background-color: var(--dark-grey);
+	}
+	.checkmark-yellow {
+		background-color: var(--dark-yellow);
+	}
+	.checkmark-green {
+		background-color: var(--dark-green);
+	}
+
+	.container:hover input ~ .checkmark-grey {
+		background-color: #565758;
+	}
+	.container:hover input ~ .checkmark-yellow {
+		background-color: #c9b458;
+	}
+	.container:hover input ~ .checkmark-green {
+		background-color: #6aaa64;
+	}
+
+	.submit-button {
+		align-self: center;
+		border-width: 0px;
+		background-color: grey;
+		color: white;
+		height: 2rem;
+		width: 10rem;
+		margin-top: 1rem;
+	}
+
+	.submit-button:hover {
+		color: grey;
+		background-color: white;
+		border-color: grey;
+		border-width: 1px;
+		cursor: pointer;
+	}
+
+	.guessed-words {
+		display: flex;
+		justify-content: center;
+		border-color: var(--dark-border);
+		border-width: 2px;
+		border-style: solid;
+		max-width: 200px;
+		margin: auto;
+	}
+
+	.guessed-word {
+		display: flex;
+		flex-direction: row;
+	}
+
+	.word-list {
+		margin: auto;
+		display: grid;
+		max-width: 90%;
+		border-color: var(--dark-border);
+		border-width: 2px;
+		border-style: solid;
+		text-align: center;
+		margin-top: 1rem;
+	}
+
+	.word-list-filled {
+		grid-template-columns: repeat(4, 1fr);
+	}
+
+	@media only screen and (min-width: 600px) {
+		.letter-input {
+			height: 62px;
+			width: 62px;
+		}
+
+		.word-list-filled {
+			grid-template-columns: repeat(5, 1fr);
+		}
+	}
+</style>

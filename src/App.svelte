@@ -10,12 +10,13 @@
 	import { getWordList } from './lib/getWordList';
 
 	const wordListFilled = 'word-list-filled';
+	const maxGuesses = 5;
 
 	let wordList: string[] = [];
-	// let guessedWords: {
-	// 	letter: string;
-	// 	guessType: GuessType;
-	// }[][] = [];
+	let guessedWords: {
+		letter: string;
+		guessType: GuessType;
+	}[][] = [];
 	let isLoading = true;
 	getWordList()
 		.then((res) => {
@@ -91,8 +92,11 @@
 		event.preventDefault();
 		let tempWordList = wordList;
 		// debugger;
-		// guessedWords = [...guessedWords, structuredClone(wordGuess)];
-		// console.log(guessedWords);
+		console.log(guessedWords);
+		if (guessedWords.length === maxGuesses) {
+			return;
+		}
+		guessedWords = [...guessedWords, structuredClone(wordGuess)];
 		wordGuess.forEach((letter, idx) => {
 			switch (letter.guessType) {
 				case GuessType.grey: {
@@ -136,6 +140,25 @@
 
 <main>
 	<h1>Input Wordle Guess</h1>
+	{#if guessedWords.length > 0}
+		<div class="guessed-words">
+			{#each guessedWords as guessedWord}
+				<div class={`guessed-word`}>
+					{#each guessedWord as letter}
+						<p class={`guess-letter guess-letter-${letter.guessType}`}>
+							{letter.letter}
+						</p>
+					{/each}
+				</div>
+			{/each}
+		</div>
+	{/if}
+	{#if guessedWords.length === maxGuesses}
+		<div style="text-align: center;">
+			<p>You've reached the end of your guesses</p>
+			<p>Time to make your final decision</p>
+		</div>
+	{/if}
 	<form on:submit={onSubmit}>
 		<div class="word-area">
 			{#each wordGuess as letter, index}
@@ -167,6 +190,7 @@
 		</div>
 		<button class="submit-button">Submit</button>
 	</form>
+	<h2 style="text-align: center;">Filtered Word List</h2>
 	<div class={`word-list ${wordList.length > 0 ? wordListFilled : ''}`}>
 		{#if isLoading}
 			<p>loading...</p>
@@ -192,7 +216,7 @@
 	.letter-input {
 		height: 45.2px;
 		width: 45.2px;
-		font-size: 2rem;
+		font-size: 1rem;
 		text-align: center;
 		font-weight: bold;
 		background-color: black;
@@ -230,7 +254,7 @@
 		padding-left: 35px;
 		margin-top: 0.1rem;
 		cursor: pointer;
-		font-size: 22px;
+		font-size: 1em;
 		-webkit-user-select: none;
 		-moz-user-select: none;
 		-ms-user-select: none;
@@ -290,18 +314,39 @@
 	}
 
 	.guessed-words {
-		display: flex;
+		display: grid;
 		justify-content: center;
 		border-color: var(--dark-border);
 		border-width: 2px;
 		border-style: solid;
 		max-width: 200px;
 		margin: auto;
+		margin-bottom: 10px;
 	}
 
 	.guessed-word {
+		display: grid;
+		/* flex-direction: row; */
+		grid-template-columns: repeat(5, 1fr);
+		gap: 0.5rem;
+	}
+
+	.guess-letter {
 		display: flex;
-		flex-direction: row;
+		height: 30px;
+		width: 30px;
+		justify-content: center;
+		align-items: center;
+	}
+
+	.guess-letter-grey {
+		background-color: var(--dark-grey);
+	}
+	.guess-letter-yellow {
+		background-color: var(--dark-yellow);
+	}
+	.guess-letter-green {
+		background-color: var(--dark-green);
 	}
 
 	.word-list {
@@ -323,6 +368,14 @@
 		.letter-input {
 			height: 62px;
 			width: 62px;
+		}
+
+		.letter-input {
+			font-size: 2rem;
+		}
+
+		.container {
+			font-size: 1.375em;
 		}
 
 		.word-list-filled {

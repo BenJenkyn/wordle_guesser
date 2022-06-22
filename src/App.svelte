@@ -7,30 +7,49 @@
 </script>
 
 <script lang="ts">
-	import { getWordList } from './lib/getWordList';
+	import { getWordList, getAllPossibleAnswersList } from './lib/getWordList';
 
 	const wordListFilled = 'word-list-filled';
 	const maxGuesses = 5;
 
-	let wordList: string[] = [];
-	let wordLists: string[][] = [];
+	let answersList: string[] = [];
+	let answersLists: string[][] = [];
+
+	let allPossibleAnswersList: string[] = [];
+
 	let guessedWords: {
 		letter: string;
 		guessType: GuessType;
 	}[][] = [];
-	let isLoading = true;
+
+	let isLoadingAnswers = true;
+	let isLoadingAllAnswersList = true;
+	let isInvalidWord = false;
 	getWordList()
 		.then((res) => {
 			res.forEach((word, idx) => {
 				res[idx] = word.toUpperCase();
 			});
-			wordList = res;
-			wordLists = [...wordLists, wordList];
-			isLoading = false;
+			answersList = res;
+			answersLists = [...answersLists, answersList];
+			isLoadingAnswers = false;
 		})
 		.catch((error) => {
 			console.error(error);
-			isLoading = false;
+			isLoadingAnswers = false;
+		});
+
+	getAllPossibleAnswersList()
+		.then((res) => {
+			res.forEach((word, idx) => {
+				res[idx] = word.toUpperCase();
+			});
+			allPossibleAnswersList = res;
+			isLoadingAllAnswersList = false;
+		})
+		.catch((error) => {
+			console.error(error);
+			isLoadingAllAnswersList = false;
 		});
 	let wordGuess = [
 		{
@@ -91,11 +110,23 @@
 	}
 
 	function onSubmit(event: SubmitEvent) {
+		isInvalidWord = false;
 		event.preventDefault();
-		let tempWordList = wordList;
+		let tempWordList = answersList;
 		if (guessedWords.length === maxGuesses) {
 			return;
 		}
+		const guessedWordString = wordGuess.reduce((acc, currWord) => {
+			return (acc = `${acc}${currWord.letter}`);
+		}, '');
+		if (
+			!allPossibleAnswersList.includes(guessedWordString) &&
+			!answersLists[0].includes(guessedWordString)
+		) {
+			isInvalidWord = true;
+			return;
+		}
+		
 		guessedWords = [...guessedWords, structuredClone(wordGuess)];
 		wordGuess.forEach((letter, idx) => {
 			switch (letter.guessType) {
@@ -134,15 +165,15 @@
 			letter.guessType = GuessType.grey;
 		});
 		inputRefs[0].focus();
-		wordList = tempWordList;
-		wordLists = [...wordLists, wordList];
-		console.log(wordLists);
+		answersList = tempWordList;
+		answersLists = [...answersLists, answersList];
+		console.log(answersLists);
 	}
 
 	function onUndo() {
 		guessedWords = [...guessedWords.slice(0, guessedWords.length - 1)];
-		wordLists = [...wordLists.slice(0, wordLists.length - 1)];
-		wordList = wordLists[wordLists.length - 1];
+		answersLists = [...answersLists.slice(0, answersLists.length - 1)];
+		answersList = answersLists[answersLists.length - 1];
 	}
 </script>
 
@@ -184,7 +215,10 @@
 					/>
 					<div class="radios">
 						{#each guessTypes as guess}
-							<label class="container" aria-label={`letter-${index}-color-selector-${guess}`}>
+							<label
+								class="container"
+								aria-label={`letter-${index}-color-selector-${guess}`}
+							>
 								<input
 									type="radio"
 									bind:group={letter.guessType}
@@ -197,23 +231,32 @@
 				</div>
 			{/each}
 		</div>
+		{#if isInvalidWord}
+			<p>Not in word list</p>
+		{/if}
 		<button class="submit-button">Submit</button>
-		{#if wordLists.length > 1}
+		{#if answersLists.length > 1}
 			<button class="submit-button" type="button" on:click={onUndo}>
 				Undo
 			</button>
 		{/if}
 	</form>
 	<h2 style="text-align: center;">
-		Filtered Word List ({wordList.length} Possible Words)
+		Filtered Word List ({answersList.length} Possible Words)
 	</h2>
-	<div class={`word-list ${wordList.length > 0 ? wordListFilled : ''}`}>
-		{#if isLoading}
+	<div
+		class={`word-list ${
+			answersList.length > 0 && answersLists.length > 1 ? wordListFilled : ''
+		}`}
+	>
+		{#if isLoadingAnswers}
 			<p>loading...</p>
-		{:else if wordList.length === 0}
+		{:else if answersList.length === 0}
 			<p>NO WORDS AVALIBLE...</p>
+		{:else if answersLists.length === 1}
+			<p>Enter a guess to begin filtering words</p>
 		{:else}
-			{#each wordList as word}
+			{#each answersList as word}
 				<p>{word}</p>
 			{/each}
 		{/if}
@@ -314,7 +357,7 @@
 	.submit-button {
 		align-self: center;
 		border-width: 0px;
-		background-color: grey;
+		background-color: var(--dark-grey);
 		color: white;
 		height: 2rem;
 		width: 10rem;

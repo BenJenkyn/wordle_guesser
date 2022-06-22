@@ -180,10 +180,11 @@
 						on:keydown={onKeyDown}
 						required
 						class={`letter-input letter-input-${letter.guessType}`}
+						aria-label={`letter-input-${index}`}
 					/>
 					<div class="radios">
 						{#each guessTypes as guess}
-							<label class="container">
+							<label class="container" aria-label={`letter-${index}-color-selector-${guess}`}>
 								<input
 									type="radio"
 									bind:group={letter.guessType}
@@ -321,7 +322,7 @@
 	}
 
 	.submit-button:hover {
-		color: grey;
+		color: var(--dark-grey);
 		background-color: white;
 		border-color: grey;
 		border-width: 1px;

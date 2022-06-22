@@ -84,7 +84,7 @@
 					wordGuess[idx].letter = event.key.toUpperCase();
 					ref.value = event.key.toUpperCase();
 					wordGuess[idx].letter = event.key.toUpperCase();
-					inputRefs[idx < inputRefs.length ? idx + 1 : idx].focus();
+					inputRefs[idx < inputRefs.length - 1 ? idx + 1 : idx].focus();
 				}
 			}
 		});

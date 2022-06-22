@@ -13,6 +13,7 @@
 	const maxGuesses = 5;
 
 	let wordList: string[] = [];
+	let wordLists: string[][] = [];
 	let guessedWords: {
 		letter: string;
 		guessType: GuessType;
@@ -24,6 +25,7 @@
 				res[idx] = word.toUpperCase();
 			});
 			wordList = res;
+			wordLists = [...wordLists, wordList];
 			isLoading = false;
 		})
 		.catch((error) => {
@@ -91,8 +93,6 @@
 	function onSubmit(event: SubmitEvent) {
 		event.preventDefault();
 		let tempWordList = wordList;
-		// debugger;
-		console.log(guessedWords);
 		if (guessedWords.length === maxGuesses) {
 			return;
 		}
@@ -135,6 +135,14 @@
 		});
 		inputRefs[0].focus();
 		wordList = tempWordList;
+		wordLists = [...wordLists, wordList];
+		console.log(wordLists);
+	}
+
+	function onUndo() {
+		guessedWords = [...guessedWords.slice(0, guessedWords.length - 1)];
+		wordLists = [...wordLists.slice(0, wordLists.length - 1)];
+		wordList = wordLists[wordLists.length - 1];
 	}
 </script>
 
@@ -189,8 +197,15 @@
 			{/each}
 		</div>
 		<button class="submit-button">Submit</button>
+		{#if wordLists.length > 1}
+			<button class="submit-button" type="button" on:click={onUndo}>
+				Undo
+			</button>
+		{/if}
 	</form>
-	<h2 style="text-align: center;">Filtered Word List</h2>
+	<h2 style="text-align: center;">
+		Filtered Word List ({wordList.length} Possible Words)
+	</h2>
 	<div class={`word-list ${wordList.length > 0 ? wordListFilled : ''}`}>
 		{#if isLoading}
 			<p>loading...</p>
@@ -380,6 +395,10 @@
 
 		.word-list-filled {
 			grid-template-columns: repeat(5, 1fr);
+		}
+
+		.word-list p {
+			font-size: 1.5em;
 		}
 	}
 </style>

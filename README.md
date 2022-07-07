@@ -26,4 +26,5 @@ This website is designed to be used while played alongside wordle. When you type
 ## Sources
 
 [List of possible answers in alphabetical order](https://gist.github.com/cfreshman/a7b776506c73284511034e63af1017ee)
+
 [List of allowed guesses in alphabetical order](https://gist.github.com/cfreshman/40608e78e83eb4e1d60b285eb7e9732f)

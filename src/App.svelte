@@ -12,6 +12,8 @@
 	const wordListFilled = 'word-list-filled';
 	const maxGuesses = 5;
 
+	let isStartTyping = false;
+
 	let answersList: string[] = [];
 	let answersLists: string[][] = [];
 
@@ -107,6 +109,7 @@
 				}
 			}
 		});
+		isStartTyping = true;
 	}
 
 	function onSubmit(event: SubmitEvent) {
@@ -126,7 +129,7 @@
 			isInvalidWord = true;
 			return;
 		}
-		
+
 		guessedWords = [...guessedWords, structuredClone(wordGuess)];
 		wordGuess.forEach((letter, idx) => {
 			switch (letter.guessType) {
@@ -168,6 +171,7 @@
 		answersList = tempWordList;
 		answersLists = [...answersLists, answersList];
 		console.log(answersLists);
+		isStartTyping = false;
 	}
 
 	function onUndo() {
@@ -210,7 +214,9 @@
 						use:assignRefs
 						on:keydown={onKeyDown}
 						required
-						class={`letter-input letter-input-${letter.guessType}`}
+						class={`letter-input ${
+							isStartTyping ? `letter-input-${letter.guessType}` : ''
+						}`}
 						aria-label={`letter-input-${index}`}
 					/>
 					<div class="radios">
@@ -223,6 +229,9 @@
 									type="radio"
 									bind:group={letter.guessType}
 									value={guess}
+									on:click={() => {
+										isStartTyping = true;
+									}}
 								/>
 								<span class={`checkmark checkmark-${guess}`} />
 							</label>
@@ -278,7 +287,8 @@
 		font-size: 1rem;
 		text-align: center;
 		font-weight: bold;
-		background-color: black;
+		/* background-color: black; */
+		background-color: var(--dark-grey);
 		color: white;
 		border-width: 0px;
 		border-radius: 0px;

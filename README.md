@@ -16,8 +16,11 @@ This website is designed to be used while played alongside wordle. When you type
 ## Commands
 
 `yarn dev` - Starts the devlopement build
+
 `yarn build` - Builds the website
+
 `yarn preview` - Previews the website build
+
 `yarn build-and-preview` - Builds and preivews the website in one command
 
 ## Sources

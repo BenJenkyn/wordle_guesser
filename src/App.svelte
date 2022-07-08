@@ -126,7 +126,7 @@
 			isInvalidWord = true;
 			return;
 		}
-		
+
 		guessedWords = [...guessedWords, structuredClone(wordGuess)];
 		wordGuess.forEach((letter, idx) => {
 			switch (letter.guessType) {
@@ -209,6 +209,15 @@
 						bind:this={inputRefs[index]}
 						use:assignRefs
 						on:keydown={onKeyDown}
+						on:keyup={(event) => {
+							const maxLength = 1;
+							if (event.currentTarget.value.length > maxLength) {
+								event.currentTarget.value = event.currentTarget.value.substring(
+									0,
+									maxLength
+								);
+							}
+						}}
 						required
 						class={`letter-input letter-input-${letter.guessType}`}
 						aria-label={`letter-input-${index}`}

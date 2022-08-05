@@ -1,6 +1,6 @@
 # Wordle Guesser
 
-[Here is a link to the website!](https://wordle-gusser.web.app/)
+[Here is a link to the website!](https://wordle-guesser-76749.web.app/)
 
 ## How to use
 

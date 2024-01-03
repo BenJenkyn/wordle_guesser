@@ -8,7 +8,7 @@
 
 <script lang="ts">
 	import { getWordList, getAllPossibleAnswersList } from './lib/getWordList';
-	import ConfirmModal from './Components/ConfirmModal.svelte';
+	import ConfirmModal from './componentsTemp/ConfirmModal.svelte';
 	let showModal = false;
 
 	const wordListFilled = 'word-list-filled';

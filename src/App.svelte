@@ -8,6 +8,8 @@
 
 <script lang="ts">
 	import { getWordList, getAllPossibleAnswersList } from './lib/getWordList';
+	import ConfirmModal from './components/ConfirmModal.svelte';
+	let showModal = false;
 
 	const wordListFilled = 'word-list-filled';
 	const maxGuesses = 5;
@@ -179,6 +181,17 @@
 		answersLists = [...answersLists.slice(0, answersLists.length - 1)];
 		answersList = answersLists[answersLists.length - 1];
 	}
+
+	function onClear() {
+		showModal = true;
+	}
+
+	function onClearConfirmed() {
+		guessedWords = [];
+		answersLists = [answersLists[0]];
+		answersList = answersLists[0];
+		showModal = false;
+	}
 </script>
 
 <main>
@@ -248,6 +261,15 @@
 			<button class="submit-button" type="button" on:click={onUndo}>
 				Undo
 			</button>
+			<button class="submit-button" type="button" on:click={onClear}>
+				Clear
+			</button>
+			{#if answersLists.length > 1 && showModal}
+				<ConfirmModal
+					on:confirm={onClearConfirmed}
+					on:cancel={() => (showModal = false)}
+				/>
+			{/if}
 		{/if}
 	</form>
 	<h2 style="text-align: center;">

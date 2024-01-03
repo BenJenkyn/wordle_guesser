@@ -8,7 +8,7 @@
 
 <script lang="ts">
 	import { getWordList, getAllPossibleAnswersList } from './lib/getWordList';
-	import ConfirmModal from './components/ConfirmModal.svelte';
+	import ConfirmModal from './Components/ConfirmModal.svelte';
 	let showModal = false;
 
 	const wordListFilled = 'word-list-filled';
@@ -177,6 +177,11 @@
 	}
 
 	function onUndo() {
+		if (guessedWords.length > 0) {
+			const lastGuessedWord = guessedWords.pop();
+			wordGuess = [...lastGuessedWord];
+			isStartTyping=true;
+		}
 		guessedWords = [...guessedWords.slice(0, guessedWords.length - 1)];
 		answersLists = [...answersLists.slice(0, answersLists.length - 1)];
 		answersList = answersLists[answersLists.length - 1];

@@ -29,6 +29,7 @@
 	let isLoadingAnswers = true;
 	let isLoadingAllAnswersList = true;
 	let isInvalidWord = false;
+	
 	getWordList()
 		.then((res) => {
 			res.forEach((word, idx) => {
@@ -97,22 +98,50 @@
 					}
 					ref.value = '';
 					wordGuess[idx].letter = '';
-				} else if (
-					event.keyCode >= 65 &&
-					event.keyCode <= 90 &&
-					event.altKey === false &&
-					event.metaKey === false
-				) {
-					event.preventDefault();
-					wordGuess[idx].letter = event.key.toUpperCase();
-					ref.value = event.key.toUpperCase();
-					wordGuess[idx].letter = event.key.toUpperCase();
-					inputRefs[idx < inputRefs.length - 1 ? idx + 1 : idx].focus();
-				}
+				} 
+				// else if (
+				// 	event.keyCode >= 65 &&
+				// 	event.keyCode <= 90 &&
+				// 	event.altKey === false &&
+				// 	event.metaKey === false
+				// ) {
+				// 	event.preventDefault();
+				// 	wordGuess[idx].letter = event.key.toUpperCase();
+				// 	ref.value = event.key.toUpperCase();
+				// 	wordGuess[idx].letter = event.key.toUpperCase();
+
+				// 	// If a character has been entered and this is not the last input field
+				// 	if (event.key.length === 1 && idx < inputRefs.length - 1) {
+				// 		// Wait for the next event loop iteration to ensure the character has been entered
+				// 		setTimeout(() => {
+				// 			// Set the focus to the next input field
+				// 			inputRefs[idx + 1].focus();
+				// 		}, 0);
+				// 	}
+				// }
 			}
 		});
 		isStartTyping = true;
 	}
+
+	async function onInput(event: Event) {
+    const target = event.currentTarget as HTMLInputElement;
+    const idx = inputRefs.findIndex(ref => ref === target);
+    
+    if (idx > -1) {
+        const value = target.value.toUpperCase();
+        wordGuess[idx].letter = value;
+        target.value = value;
+
+        if (value.length === 1 && idx < inputRefs.length - 1) {
+            setTimeout(() => {
+                inputRefs[idx + 1].focus();
+            }, 0);
+        }
+    }
+    isStartTyping = true;
+}
+
 
 	function onSubmit(event: SubmitEvent) {
 		isInvalidWord = false;
@@ -180,7 +209,7 @@
 		if (guessedWords.length > 0) {
 			const lastGuessedWord = guessedWords.pop();
 			wordGuess = [...lastGuessedWord];
-			isStartTyping=true;
+			isStartTyping = true;
 		}
 		guessedWords = [...guessedWords.slice(0, guessedWords.length - 1)];
 		answersLists = [...answersLists.slice(0, answersLists.length - 1)];
@@ -230,12 +259,19 @@
 						maxlength="1"
 						bind:this={inputRefs[index]}
 						use:assignRefs
+						on:input={onInput}
 						on:keydown={onKeyDown}
 						required
 						class={`letter-input ${
 							isStartTyping ? `letter-input-${letter.guessType}` : ''
 						}`}
 						aria-label={`letter-input-${index}`}
+						autocomplete="off"
+						autocorrect="off"
+						autocapitalize="off"
+						spellcheck="false"
+						contenteditable="true"
+						
 					/>
 					<div class="radios">
 						{#each guessTypes as guess}

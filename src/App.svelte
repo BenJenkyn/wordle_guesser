@@ -178,9 +178,9 @@
 
 	function onUndo() {
 		if (guessedWords.length > 0) {
-			const lastGuessedWord = guessedWords.pop();
+			const lastGuessedWord = guessedWords[guessedWords.length - 1];
 			wordGuess = [...lastGuessedWord];
-			isStartTyping=true;
+			isStartTyping = true;
 		}
 		guessedWords = [...guessedWords.slice(0, guessedWords.length - 1)];
 		answersLists = [...answersLists.slice(0, answersLists.length - 1)];

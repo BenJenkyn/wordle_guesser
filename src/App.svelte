@@ -209,7 +209,7 @@
 </script>
 
 <main>
-	<h1>Input Wordle Guess</h1>
+	<h1>Wordle Assist</h1>
 	{#if guessedWords.length > 0}
 		<div class="guessed-words">
 			{#each guessedWords as guessedWord}

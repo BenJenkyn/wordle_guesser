@@ -99,26 +99,6 @@
 					ref.value = '';
 					wordGuess[idx].letter = '';
 				} 
-				// else if (
-				// 	event.keyCode >= 65 &&
-				// 	event.keyCode <= 90 &&
-				// 	event.altKey === false &&
-				// 	event.metaKey === false
-				// ) {
-				// 	event.preventDefault();
-				// 	wordGuess[idx].letter = event.key.toUpperCase();
-				// 	ref.value = event.key.toUpperCase();
-				// 	wordGuess[idx].letter = event.key.toUpperCase();
-
-				// 	// If a character has been entered and this is not the last input field
-				// 	if (event.key.length === 1 && idx < inputRefs.length - 1) {
-				// 		// Wait for the next event loop iteration to ensure the character has been entered
-				// 		setTimeout(() => {
-				// 			// Set the focus to the next input field
-				// 			inputRefs[idx + 1].focus();
-				// 		}, 0);
-				// 	}
-				// }
 			}
 		});
 		isStartTyping = true;
@@ -161,7 +141,7 @@
 			return;
 		}
 
-		guessedWords = [...guessedWords, structuredClone(wordGuess)];
+		guessedWords = [...guessedWords, JSON.parse(JSON.stringify(wordGuess))];
 		wordGuess.forEach((letter, idx) => {
 			switch (letter.guessType) {
 				case GuessType.grey: {

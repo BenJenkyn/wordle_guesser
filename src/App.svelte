@@ -29,7 +29,7 @@
 	let isLoadingAnswers = true;
 	let isLoadingAllAnswersList = true;
 	let isInvalidWord = false;
-	
+
 	getWordList()
 		.then((res) => {
 			res.forEach((word, idx) => {
@@ -98,30 +98,29 @@
 					}
 					ref.value = '';
 					wordGuess[idx].letter = '';
-				} 
+				}
 			}
 		});
 		isStartTyping = true;
 	}
 
 	async function onInput(event: Event) {
-    const target = event.currentTarget as HTMLInputElement;
-    const idx = inputRefs.findIndex(ref => ref === target);
-    
-    if (idx > -1) {
-        const value = target.value.toUpperCase();
-        wordGuess[idx].letter = value;
-        target.value = value;
+		const target = event.currentTarget as HTMLInputElement;
+		const idx = inputRefs.findIndex((ref) => ref === target);
 
-        if (value.length === 1 && idx < inputRefs.length - 1) {
-            setTimeout(() => {
-                inputRefs[idx + 1].focus();
-            }, 0);
-        }
-    }
-    isStartTyping = true;
-}
+		if (idx > -1) {
+			const value = target.value.toUpperCase();
+			wordGuess[idx].letter = value;
+			target.value = value;
 
+			if (value.length === 1 && idx < inputRefs.length - 1) {
+				setTimeout(() => {
+					inputRefs[idx + 1].focus();
+				}, 0);
+			}
+		}
+		isStartTyping = true;
+	}
 
 	function onSubmit(event: SubmitEvent) {
 		isInvalidWord = false;
@@ -251,7 +250,6 @@
 						autocapitalize="off"
 						spellcheck="false"
 						contenteditable="true"
-						
 					/>
 					<div class="radios">
 						{#each guessTypes as guess}
@@ -293,9 +291,11 @@
 			{/if}
 		{/if}
 	</form>
-	<h2 style="text-align: center;">
-		Filtered Word List ({answersList.length} Possible Words)
-	</h2>
+	{#if answersLists.length > 1}
+		<h2 style="text-align: center;">
+			Filtered Word List ({answersList.length} Possible Words)
+		</h2>
+	{/if}
 	<div
 		class={`word-list ${
 			answersList.length > 0 && answersLists.length > 1 ? wordListFilled : ''
@@ -306,7 +306,13 @@
 		{:else if answersList.length === 0}
 			<p>NO WORDS AVALIBLE...</p>
 		{:else if answersLists.length === 1}
-			<p>Enter a guess to begin filtering words</p>
+			<h2>How To Use</h2>
+			<p>
+				Have Wordle Open in another screen and make a guess. Then input your
+				guess into the provided input and select the corisponding colours to
+				narrow down potential answers based on the results. A list of possible
+				words will appear in this box once you hit submit.
+			</p>
 		{:else}
 			{#each answersList as word}
 				<p>{word}</p>
@@ -316,6 +322,9 @@
 </main>
 
 <style>
+	main {
+		padding: 1rem;
+	}
 	h1 {
 		text-align: center;
 	}
@@ -464,12 +473,14 @@
 	.word-list {
 		margin: auto;
 		display: grid;
-		max-width: 90%;
+		width: 90%;
+		max-width: 1280px;
 		border-color: var(--dark-border);
 		border-width: 2px;
 		border-style: solid;
 		text-align: center;
 		margin-top: 1rem;
+		padding: 0 1rem;
 	}
 
 	.word-list-filled {

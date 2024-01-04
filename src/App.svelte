@@ -207,7 +207,7 @@
 
 	function onUndo() {
 		if (guessedWords.length > 0) {
-			const lastGuessedWord = guessedWords.pop();
+			const lastGuessedWord = guessedWords[guessedWords.length - 1];
 			wordGuess = [...lastGuessedWord];
 			isStartTyping = true;
 		}

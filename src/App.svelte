@@ -309,9 +309,9 @@
 			<h2>How To Use</h2>
 			<p>
 				Have Wordle Open in another screen and make a guess. Then input your
-				guess into the provided input and select the corisponding colours to
-				narrow down potential answers based on the results. A list of possible
-				words will appear in this box once you hit submit.
+				guess into the input box provided and select the corresponding colours
+				to narrow down potential answers based on the results. A list of
+				possible words will appear in this box once you hit submit.
 			</p>
 		{:else}
 			{#each answersList as word}

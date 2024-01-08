@@ -220,18 +220,16 @@
 	<form on:submit={onSubmit}>
 		<div class="word-area">
 			{#each wordGuess as letter, index}
-				<div class="letter-inputs">
-					<LetterInput
-						bind:letter
-						bind:isStartTyping
-						{inputRefs}
-						{onInput}
-						{onKeyDown}
-						{assignRefs}
-						{index}
-						{guessTypes}
-					/>
-				</div>
+				<LetterInput
+					bind:letter
+					bind:isStartTyping
+					{inputRefs}
+					{onInput}
+					{onKeyDown}
+					{assignRefs}
+					{index}
+					{guessTypes}
+				/>
 			{/each}
 		</div>
 		{#if isInvalidWord}

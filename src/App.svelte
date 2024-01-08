@@ -37,10 +37,7 @@
 
 	getWordList()
 		.then((res) => {
-			res.forEach((word, idx) => {
-				res[idx] = word.toUpperCase();
-			});
-			answersList = res;
+			answersList = res.map((word) => word.toUpperCase());
 			answersLists = [...answersLists, answersList];
 			isLoadingAnswers = false;
 		})
@@ -51,10 +48,7 @@
 
 	getAllPossibleAnswersList()
 		.then((res) => {
-			res.forEach((word, idx) => {
-				res[idx] = word.toUpperCase();
-			});
-			allPossibleAnswersList = res;
+			allPossibleAnswersList = res.map((word) => word.toUpperCase());
 			isLoadingAllAnswersList = false;
 		})
 		.catch((error) => {

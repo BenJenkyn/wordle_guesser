@@ -24,6 +24,7 @@
 	const wordLength = 5;
 
 	let isStartTyping = false;
+	$: isRowEmpty = wordGuess.every(item => item.letter === '' && item.guessType === GuessType.grey);
 
 	let answersList: string[] = [];
 	let answersLists: string[][] = [];
@@ -229,7 +230,9 @@
 	{/if}
 	<form on:submit={onSubmit}>
 		<div class="word-area">
+			{#if !isRowEmpty && isStartTyping}
 				<div class="clear-row-button-wrapper" />
+			{/if}
 			{#each wordGuess as letter, index}
 				<LetterInput
 					bind:letter
@@ -242,12 +245,14 @@
 					{guessTypes}
 				/>
 			{/each}
+			{#if !isRowEmpty && isStartTyping}
 				<div
 					class="clear-row-button clear-row-button-wrapper"
 					on:click={clearInput}
 				>
 					<FaRegWindowClose />
 				</div>
+			{/if}
 		</div>
 		{#if isInvalidWord}
 			<p>Not in word list</p>

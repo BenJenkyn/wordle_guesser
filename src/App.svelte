@@ -308,10 +308,10 @@
 		{:else if answersLists.length === 1}
 			<h2>How To Use</h2>
 			<p>
-				Have Wordle Open in another screen and make a guess. Then input your
-				guess into the input box provided and select the corresponding colours
-				to narrow down potential answers based on the results. A list of
-				possible words will appear in this box once you hit submit.
+				Have Wordle open in another screen and make a guess. Then input your
+				Wordle guess into the input box provided and select the corresponding
+				colours to narrow down the list of possible word of the day answers. A
+				list of possible words will appear in this box once you hit submit.
 			</p>
 		{:else}
 			{#each answersList as word}

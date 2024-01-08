@@ -14,8 +14,7 @@
 <script lang="ts">
 	import { getWordList, getAllPossibleAnswersList } from './lib/getWordList';
 	import ConfirmModal from './Components/ConfirmModal.svelte';
-	import ColorRadios from './Components/ColorRadios.svelte';
-	import InputBox from './Components/InputBox.svelte';
+	import LetterInput from './Components/LetterInput.svelte';
 
 	let showModal = false;
 
@@ -228,20 +227,15 @@
 		<div class="word-area">
 			{#each wordGuess as letter, index}
 				<div class="letter-inputs">
-					<InputBox
-						{letter}
-						{isStartTyping}
+					<LetterInput
+						bind:letter
+						bind:isStartTyping
 						{inputRefs}
 						{onInput}
 						{onKeyDown}
 						{assignRefs}
-						letterIndex={index}
-					/>
-					<ColorRadios
+						{index}
 						{guessTypes}
-						bind:letter
-						bind:isStartTyping
-						letterIndex={index}
 					/>
 				</div>
 			{/each}

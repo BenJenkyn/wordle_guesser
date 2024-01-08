@@ -1,17 +1,17 @@
 * {
-    font-family: 'Clear Sans', 'Helvetica Neue', Arial, sans-serif;
-    color: white
+	font-family: 'Clear Sans', 'Helvetica Neue', Arial, sans-serif;
+	color: white;
 }
 
-body{
-    background-color: var(--dark-bg);
-    margin: 0px;
+body {
+	background-color: var(--dark-bg);
+	margin: 0px;
 }
 
 :root {
-    --dark-grey: #3a3a3c;
-    --dark-yellow: #b59f3b;
-    --dark-green: #538d4e;
-    --dark-bg: #121213;
-    --dark-border: #3a3a3c
+	--dark-grey: #3a3a3c;
+	--dark-yellow: #b59f3b;
+	--dark-green: #538d4e;
+	--dark-bg: #121213;
+	--dark-border: #3a3a3c;
 }

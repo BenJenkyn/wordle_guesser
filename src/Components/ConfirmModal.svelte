@@ -9,7 +9,7 @@
 
 <div class="modal">
 	<div class="modal-content">
-		<p>Are you sure you want to clear?</p>
+		<p>Are you sure you want to clear everything?</p>
 		<button class="confirm-button" on:click={confirm}>Yes</button>
 		<button class="confirm-button" on:click={() => dispatch('cancel')}>No</button>
 	</div>
@@ -43,7 +43,7 @@
 	}
 
   .confirm-button {
-    background-color: var(--dark-grey); /* for example, a green color */
+    background-color: var(--dark-grey);
     border: none;
     color: white;
     padding: 15px 32px;

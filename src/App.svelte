@@ -4,27 +4,34 @@
 		yellow = 'yellow',
 		green = 'green',
 	}
+
+	export type Letter = {
+		letter: string;
+		guessType: GuessType;
+	};
 </script>
 
 <script lang="ts">
 	import { getWordList, getAllPossibleAnswersList } from './lib/getWordList';
 	import ConfirmModal from './Components/ConfirmModal.svelte';
+	import LetterInput from './Components/LetterInput.svelte';
+	import FaRegWindowClose from 'svelte-icons/fa/FaRegWindowClose.svelte';
+
 	let showModal = false;
 
 	const wordListFilled = 'word-list-filled';
 	const maxGuesses = 5;
+	const wordLength = 5;
 
 	let isStartTyping = false;
+	$: isRowEmpty = wordGuess.every(item => item.letter === '' && item.guessType === GuessType.grey);
 
 	let answersList: string[] = [];
 	let answersLists: string[][] = [];
 
 	let allPossibleAnswersList: string[] = [];
 
-	let guessedWords: {
-		letter: string;
-		guessType: GuessType;
-	}[][] = [];
+	let guessedWords: Letter[][] = [];
 
 	let isLoadingAnswers = true;
 	let isLoadingAllAnswersList = true;
@@ -32,10 +39,7 @@
 
 	getWordList()
 		.then((res) => {
-			res.forEach((word, idx) => {
-				res[idx] = word.toUpperCase();
-			});
-			answersList = res;
+			answersList = res.map((word) => word.toUpperCase());
 			answersLists = [...answersLists, answersList];
 			isLoadingAnswers = false;
 		})
@@ -46,38 +50,18 @@
 
 	getAllPossibleAnswersList()
 		.then((res) => {
-			res.forEach((word, idx) => {
-				res[idx] = word.toUpperCase();
-			});
-			allPossibleAnswersList = res;
+			allPossibleAnswersList = res.map((word) => word.toUpperCase());
 			isLoadingAllAnswersList = false;
 		})
 		.catch((error) => {
 			console.error(error);
 			isLoadingAllAnswersList = false;
 		});
-	let wordGuess = [
-		{
-			letter: '',
-			guessType: GuessType.grey,
-		},
-		{
-			letter: '',
-			guessType: GuessType.grey,
-		},
-		{
-			letter: '',
-			guessType: GuessType.grey,
-		},
-		{
-			letter: '',
-			guessType: GuessType.grey,
-		},
-		{
-			letter: '',
-			guessType: GuessType.grey,
-		},
-	];
+
+	let wordGuess: Letter[] = Array.from({ length: wordLength }, () => ({
+		letter: '',
+		guessType: GuessType.grey,
+	}));
 
 	let guessTypes = [GuessType.grey, GuessType.yellow, GuessType.green];
 	let inputRefs: HTMLInputElement[] = [];
@@ -142,15 +126,22 @@
 
 		guessedWords = [...guessedWords, JSON.parse(JSON.stringify(wordGuess))];
 		wordGuess.forEach((letter, idx) => {
+			const hasDifferentGuessType = guessedWords[guessedWords.length - 1].some(
+				(l) => {
+					return l.letter === letter.letter && l.guessType !== letter.guessType;
+				}
+			);
 			switch (letter.guessType) {
 				case GuessType.grey: {
-					tempWordList = tempWordList.filter((word) => {
-						if (word.includes(letter.letter)) {
-							console.log(letter.letter);
-							return false;
-						}
-						return true;
-					});
+					if (!hasDifferentGuessType) {
+						tempWordList = tempWordList.filter((word) => {
+							if (word.includes(letter.letter)) {
+								console.log(letter.letter);
+								return false;
+							}
+							return true;
+						});
+					}
 					break;
 				}
 				case GuessType.green: {
@@ -195,6 +186,14 @@
 		answersList = answersLists[answersLists.length - 1];
 	}
 
+	function clearInput() {
+		wordGuess = Array.from({ length: wordLength }, () => ({
+			letter: '',
+			guessType: GuessType.grey,
+		}));
+		isStartTyping = false;
+	}
+
 	function onClear() {
 		showModal = true;
 	}
@@ -204,6 +203,7 @@
 		answersLists = [answersLists[0]];
 		answersList = answersLists[0];
 		showModal = false;
+		clearInput();
 	}
 </script>
 
@@ -230,47 +230,29 @@
 	{/if}
 	<form on:submit={onSubmit}>
 		<div class="word-area">
+			{#if !isRowEmpty && isStartTyping}
+				<div class="clear-row-button-wrapper" />
+			{/if}
 			{#each wordGuess as letter, index}
-				<div class="letter-inputs">
-					<input
-						type="text"
-						bind:value={letter.letter}
-						maxlength="1"
-						bind:this={inputRefs[index]}
-						use:assignRefs
-						on:input={onInput}
-						on:keydown={onKeyDown}
-						required
-						class={`letter-input ${
-							isStartTyping ? `letter-input-${letter.guessType}` : ''
-						}`}
-						aria-label={`letter-input-${index}`}
-						autocomplete="off"
-						autocorrect="off"
-						autocapitalize="off"
-						spellcheck="false"
-						contenteditable="true"
-					/>
-					<div class="radios">
-						{#each guessTypes as guess}
-							<label
-								class="container"
-								aria-label={`letter-${index}-color-selector-${guess}`}
-							>
-								<input
-									type="radio"
-									bind:group={letter.guessType}
-									value={guess}
-									on:click={() => {
-										isStartTyping = true;
-									}}
-								/>
-								<span class={`checkmark checkmark-${guess}`} />
-							</label>
-						{/each}
-					</div>
-				</div>
+				<LetterInput
+					bind:letter
+					bind:isStartTyping
+					{inputRefs}
+					{onInput}
+					{onKeyDown}
+					{assignRefs}
+					{index}
+					{guessTypes}
+				/>
 			{/each}
+			{#if !isRowEmpty && isStartTyping}
+				<div
+					class="clear-row-button clear-row-button-wrapper"
+					on:click={clearInput}
+				>
+					<FaRegWindowClose />
+				</div>
+			{/if}
 		</div>
 		{#if isInvalidWord}
 			<p>Not in word list</p>
@@ -281,7 +263,7 @@
 				Undo
 			</button>
 			<button class="submit-button" type="button" on:click={onClear}>
-				Clear
+				Clear All
 			</button>
 			{#if answersLists.length > 1 && showModal}
 				<ConfirmModal
@@ -308,10 +290,10 @@
 		{:else if answersLists.length === 1}
 			<h2>How To Use</h2>
 			<p>
-				Have Wordle Open in another screen and make a guess. Then input your
-				guess into the input box provided and select the corresponding colours
-				to narrow down potential answers based on the results. A list of
-				possible words will appear in this box once you hit submit.
+				Have Wordle open in another screen and make a guess. Then input your
+				Wordle guess into the input box provided and select the corresponding
+				colours to narrow down the list of possible word of the day answers. A
+				list of possible words will appear in this box once you hit submit.
 			</p>
 		{:else}
 			{#each answersList as word}
@@ -333,87 +315,10 @@
 		text-align: center;
 	}
 
-	.letter-input {
-		height: 45.2px;
-		width: 45.2px;
-		font-size: 1rem;
-		text-align: center;
-		font-weight: bold;
-		/* background-color: black; */
-		background-color: var(--dark-grey);
-		color: white;
-		border-width: 0px;
-		border-radius: 0px;
-		margin-bottom: 1rem;
-	}
-
-	.letter-input-grey {
-		background-color: var(--dark-grey);
-	}
-	.letter-input-yellow {
-		background-color: var(--dark-yellow);
-	}
-	.letter-input-green {
-		background-color: var(--dark-green);
-	}
-
 	.word-area {
 		display: flex;
 		gap: 5px;
 		justify-content: center;
-	}
-
-	.radios {
-		display: flex;
-		flex-direction: column;
-		border-width: 1px;
-	}
-
-	.container {
-		display: block;
-		position: relative;
-		padding-left: 35px;
-		margin-top: 0.1rem;
-		cursor: pointer;
-		font-size: 1em;
-		-webkit-user-select: none;
-		-moz-user-select: none;
-		-ms-user-select: none;
-		user-select: none;
-	}
-
-	.container input {
-		opacity: 0;
-		cursor: pointer;
-		height: 0;
-		width: 0;
-	}
-
-	.checkmark {
-		position: absolute;
-		top: 0;
-		left: 0;
-		height: 100%;
-		width: 100%;
-	}
-	.checkmark-grey {
-		background-color: var(--dark-grey);
-	}
-	.checkmark-yellow {
-		background-color: var(--dark-yellow);
-	}
-	.checkmark-green {
-		background-color: var(--dark-green);
-	}
-
-	.container:hover input ~ .checkmark-grey {
-		background-color: #565758;
-	}
-	.container:hover input ~ .checkmark-yellow {
-		background-color: #c9b458;
-	}
-	.container:hover input ~ .checkmark-green {
-		background-color: #6aaa64;
 	}
 
 	.submit-button {
@@ -434,6 +339,19 @@
 		cursor: pointer;
 	}
 
+	.clear-row-button-wrapper {
+		height: 2rem;
+		width: 2rem;
+	}
+
+	.clear-row-button {
+		margin-top: 0.5rem;
+		cursor: pointer;
+	}
+	.clear-row-button:hover {
+		filter: invert(0.25);
+	}
+
 	.guessed-words {
 		display: grid;
 		justify-content: center;
@@ -447,7 +365,6 @@
 
 	.guessed-word {
 		display: grid;
-		/* flex-direction: row; */
 		grid-template-columns: repeat(5, 1fr);
 		gap: 0.5rem;
 	}
@@ -493,20 +410,16 @@
 			width: 62px;
 		}
 
-		.letter-input {
-			font-size: 2rem;
-		}
-
-		.container {
-			font-size: 1.375em;
-		}
-
 		.word-list-filled {
 			grid-template-columns: repeat(5, 1fr);
 		}
 
 		.word-list p {
 			font-size: 1.5em;
+		}
+
+		.clear-row-button {
+			margin-top: 1rem;
 		}
 	}
 </style>

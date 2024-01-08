@@ -8,7 +8,7 @@
 	export type Letter = {
 		letter: string;
 		guessType: GuessType;
-	}
+	};
 </script>
 
 <script lang="ts">
@@ -128,15 +128,22 @@
 
 		guessedWords = [...guessedWords, JSON.parse(JSON.stringify(wordGuess))];
 		wordGuess.forEach((letter, idx) => {
+			const hasDifferentGuessType = guessedWords[guessedWords.length - 1].some(
+				(l) => {
+					return l.letter === letter.letter && l.guessType !== letter.guessType
+				}
+			);
 			switch (letter.guessType) {
 				case GuessType.grey: {
-					tempWordList = tempWordList.filter((word) => {
-						if (word.includes(letter.letter)) {
-							console.log(letter.letter);
-							return false;
-						}
-						return true;
-					});
+					if (!hasDifferentGuessType) {
+						tempWordList = tempWordList.filter((word) => {
+							if (word.includes(letter.letter)) {
+								console.log(letter.letter);
+								return false;
+							}
+							return true;
+						});
+					}
 					break;
 				}
 				case GuessType.green: {

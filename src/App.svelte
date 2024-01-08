@@ -4,6 +4,11 @@
 		yellow = 'yellow',
 		green = 'green',
 	}
+
+	export type Letter = {
+		letter: string;
+		guessType: GuessType;
+	}
 </script>
 
 <script lang="ts">
@@ -13,6 +18,7 @@
 
 	const wordListFilled = 'word-list-filled';
 	const maxGuesses = 5;
+	const wordLength = 5;
 
 	let isStartTyping = false;
 
@@ -21,10 +27,7 @@
 
 	let allPossibleAnswersList: string[] = [];
 
-	let guessedWords: {
-		letter: string;
-		guessType: GuessType;
-	}[][] = [];
+	let guessedWords: Letter[][] = [];
 
 	let isLoadingAnswers = true;
 	let isLoadingAllAnswersList = true;
@@ -56,28 +59,11 @@
 			console.error(error);
 			isLoadingAllAnswersList = false;
 		});
-	let wordGuess = [
-		{
-			letter: '',
-			guessType: GuessType.grey,
-		},
-		{
-			letter: '',
-			guessType: GuessType.grey,
-		},
-		{
-			letter: '',
-			guessType: GuessType.grey,
-		},
-		{
-			letter: '',
-			guessType: GuessType.grey,
-		},
-		{
-			letter: '',
-			guessType: GuessType.grey,
-		},
-	];
+
+	let wordGuess: Letter[] = Array.from({ length: wordLength }, () => ({
+		letter: '',
+		guessType: GuessType.grey,
+	}));
 
 	let guessTypes = [GuessType.grey, GuessType.yellow, GuessType.green];
 	let inputRefs: HTMLInputElement[] = [];

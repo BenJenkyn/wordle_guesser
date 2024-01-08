@@ -43,7 +43,7 @@
 	}
 
   .confirm-button {
-    background-color: var(--dark-grey); /* for example, a green color */
+    background-color: var(--dark-grey);
     border: none;
     color: white;
     padding: 15px 32px;

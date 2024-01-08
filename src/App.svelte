@@ -15,6 +15,7 @@
 	import { getWordList, getAllPossibleAnswersList } from './lib/getWordList';
 	import ConfirmModal from './Components/ConfirmModal.svelte';
 	import LetterInput from './Components/LetterInput.svelte';
+	import FaRegWindowClose from 'svelte-icons/fa/FaRegWindowClose.svelte';
 
 	let showModal = false;
 
@@ -184,6 +185,14 @@
 		answersList = answersLists[answersLists.length - 1];
 	}
 
+	function clearInput() {
+		wordGuess = Array.from({ length: wordLength }, () => ({
+			letter: '',
+			guessType: GuessType.grey,
+		}));
+		isStartTyping = false;
+	}
+
 	function onClear() {
 		showModal = true;
 	}
@@ -193,6 +202,7 @@
 		answersLists = [answersLists[0]];
 		answersList = answersLists[0];
 		showModal = false;
+		clearInput();
 	}
 </script>
 
@@ -219,6 +229,7 @@
 	{/if}
 	<form on:submit={onSubmit}>
 		<div class="word-area">
+				<div class="clear-row-button-wrapper" />
 			{#each wordGuess as letter, index}
 				<LetterInput
 					bind:letter
@@ -231,6 +242,12 @@
 					{guessTypes}
 				/>
 			{/each}
+				<div
+					class="clear-row-button clear-row-button-wrapper"
+					on:click={clearInput}
+				>
+					<FaRegWindowClose />
+				</div>
 		</div>
 		{#if isInvalidWord}
 			<p>Not in word list</p>
@@ -241,7 +258,7 @@
 				Undo
 			</button>
 			<button class="submit-button" type="button" on:click={onClear}>
-				Clear
+				Clear All
 			</button>
 			{#if answersLists.length > 1 && showModal}
 				<ConfirmModal
@@ -317,6 +334,19 @@
 		cursor: pointer;
 	}
 
+	.clear-row-button-wrapper {
+		height: 2rem;
+		width: 2rem;
+	}
+
+	.clear-row-button {
+		margin-top: 0.5rem;
+		cursor: pointer;
+	}
+	.clear-row-button:hover {
+		filter: invert(0.25);
+	}
+
 	.guessed-words {
 		display: grid;
 		justify-content: center;
@@ -330,7 +360,6 @@
 
 	.guessed-word {
 		display: grid;
-		/* flex-direction: row; */
 		grid-template-columns: repeat(5, 1fr);
 		gap: 0.5rem;
 	}
@@ -382,6 +411,10 @@
 
 		.word-list p {
 			font-size: 1.5em;
+		}
+
+		.clear-row-button {
+			margin-top: 1rem;
 		}
 	}
 </style>
